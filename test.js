@@ -33,7 +33,7 @@ var fitnes = {};
 // console.log(filename);
 // read from a file
 var workbook = new Excel.Workbook();
-workbook.xlsx.readFile(__dirname + '\\exel_file\\' + filename + '.xlsx')
+workbook.xlsx.readFile(__dirname + '\\exel_file_' + month + '\\' + filename + '.xlsx')
     .then(function() {
         console.log('read success');
         var worksheet = workbook.getWorksheet(1);
