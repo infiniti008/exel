@@ -6,32 +6,6 @@ var month = 2;
 
 var colums_col = 28;
 var fitnes = {};
-// var count = 1;
-
-// Access an individual columns by key, letter and 1-based column number
-// var idCol = worksheet.getColumn('id');
-// var nameCol = worksheet.getColumn('B');
-// var dobCol = worksheet.getColumn(3);
-
-// columns
-
-// iterate over all current cells in this column
-// dobCol.eachCell(function(cell, rowNumber) {
-//     // ...
-// });
-
-// Iterate over all non-null cells in a row
-// row.eachCell(function(cell, colNumber) {
-//     console.log('Cell ' + colNumber + ' = ' + cell.value);
-// });
-
-// iterate over all current cells in this column including empty cells
-// dobCol.eachCell({ includeEmpty: true }, function(cell, rowNumber) {
-//     // ...
-// });
-
-// console.log(filename);
-// read from a file
 var workbook = new Excel.Workbook();
 workbook.xlsx.readFile(__dirname + '\\exel_file_' + month + '\\' + filename + '.xlsx')
     .then(function() {
@@ -47,30 +21,30 @@ workbook.xlsx.readFile(__dirname + '\\exel_file_' + month + '\\' + filename + '.
     });
 
 //Функция обозначение цветов
-  function rename_color(color){
-    // console.log(color);
-      if (color == 'FF92D050') {
-          return('green');
-      }
-      else if (color == 'FFFF0000') {
-        return('red');
-      }
-      else if (color == 'FF0070C0') {
-        return('blue');
-      }
-      else if (color == 'FFFFFF00') {
-        return('yellow');
-      }
-      else if (color == 'FFFFC000') {
-        return('orange');
-      }
-      // else if (color == undefined) {
-      //   return('black');
-      // }
-      else {
-        return('white');
-      }
-  }
+function rename_color(color){
+  // console.log(color);
+    if (color == 'FF92D050') {
+        return('green');
+    }
+    else if (color == 'FFFF0000') {
+      return('red');
+    }
+    else if (color == 'FF0070C0') {
+      return('blue');
+    }
+    else if (color == 'FFFFFF00') {
+      return('yellow');
+    }
+    else if (color == 'FFFFC000') {
+      return('orange');
+    }
+    // else if (color == undefined) {
+    //   return('black');
+    // }
+    else {
+      return('white');
+    }
+}
 //
 
 //Функция перебора всей таблицы
