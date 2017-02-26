@@ -1,10 +1,14 @@
 var Excel = require('exceljs');
-var filename = 'fitnes';
+var filename = 'tren';
 var color = require('./color.json');
 var fs = require('fs');
-var month = 2;
+var month = 3;
 
-var colums_col = 28;
+var posledn_stroka = 33;//Номер последней строки
+var row_date = 3; //Номер строки с датами в месяце
+var first_col = 2;//Номер первого столбца с данными
+
+// var colums_col = 28;
 var fitnes = {};
 var workbook = new Excel.Workbook();
 workbook.xlsx.readFile(__dirname + '\\exel_file_' + month + '\\' + filename + '.xlsx')
@@ -121,8 +125,6 @@ function get_data_new(sheet, da) {
 //
 function get_arr(shee){
   console.log('in get_arr');
-  var row_date = 3; //Номер строки с датами в месяце
-  var first_col = 2;//Номер первого столбца с данными
   var first_row = row_date + 1;
   var arr = [];//Массив имен столбцев
   var table = [];// Массив таблицы с данными
@@ -137,7 +139,7 @@ function get_arr(shee){
   // day = 28;
   for (var i = 0; i < day; i++) {
     var row = [];
-    for (var j = first_row; j < first_row + 61; j++) {
+    for (var j = first_row; j < posledn_stroka + 1; j++) {
       var ty = arr[i] + j;
       if (shee.getCell(ty).fill) {
         row[j - first_row] = rename_color(shee.getCell(ty).fill.fgColor.argb);
