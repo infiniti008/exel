@@ -1,9 +1,10 @@
 var Excel = require('exceljs');
-var filename = __dirname + '\\fitnes.xlsx';
+var filename = 'fitnes';
 var color = require('./color.json');
 var fs = require('fs');
+var month = 2;
 
-var colums_col = 27;
+var colums_col = 28;
 var fitnes = {};
 // var count = 1;
 
@@ -32,18 +33,17 @@ var fitnes = {};
 // console.log(filename);
 // read from a file
 var workbook = new Excel.Workbook();
-workbook.xlsx.readFile(filename)
+workbook.xlsx.readFile(__dirname + '\\exel_file\\' + filename + '.xlsx')
     .then(function() {
-      console.log('read success');
-      var worksheet = workbook.getWorksheet(1);
-      get_data(worksheet);
-        // //Определим сколько столбцов
-        // for (var i = 2; i < 35; i++) {
-        //   if (worksheet.getRow(3).getCell(i).value > 0) {
-        //     colums_col = worksheet.getRow(3).getCell(i).value;
-        //   }
-        // }
-        // console.log(colums_col);
+        console.log('read success');
+        var worksheet = workbook.getWorksheet(1);
+        get_arr(worksheet)
+          .then(
+            data => {
+              // console.log(data);
+              get_data_new(worksheet, data);
+            }
+          );
     });
 
 //Функция обозначение цветов
@@ -74,73 +74,117 @@ workbook.xlsx.readFile(filename)
 //
 
 //Функция перебора всей таблицы
-function get_data(sheet) {
-  // for (var col = 2; col < colums_col + 2; col++) {
-  for (var col = 26; col < 27; col++) {
-    var col_1 = sheet.getColumn(col);
+function get_data_new(sheet, da) {
+  var color_current;
+  var color_before;
+  var color_after;
+  var time_before;
+  var ti = da.time;
+  var table = da.table;
+  for (var col = 0; col < table.length; col++) {
     var fi = {};
     var count = 1;
     var ending = 1;
-    var cell_before_color = 'white';
-    col_1.eachCell({ includeEmpty: false }, function(cell, rowNumber) {
-      if (rowNumber > 3 && rowNumber < 65) {
-        var adr = cell.address;
-        // console.log(adr);
-        var cell_color = rename_color(cell.fill.fgColor.argb);
-        // console.log(cell_color);
-        if (fi[count - 1]) {
-          if (cell_color != fi[count - 1].color && ending == 1) {
-            var row_before = rowNumber - 1;
-            var time_val_end = sheet.getCell('A' + row_before).value;
-            // console.log(time_val_end);
-            ending = 2;
-            var p = sheet.getCell('A' + col).value;
-            fi[count - 1].end = time_val_end.charAt(6) + time_val_end.charAt(7) + ':' + time_val_end.charAt(9) + time_val_end.charAt(10);
-            // console.log(fi);
-            // fitnes[col-1] = fi;
-          }
-        }
-
-        if (cell_color != 'white' && cell_before_color != cell_color) {
-          var time_val = sheet.getCell('A' + rowNumber).value;
-          // console.log(time_val);
-          fi[count] = {};
-          fi[count].color = cell_color;
-          fi[count].begin = time_val.charAt(0) + time_val.charAt(1) + ':' + time_val.charAt(3) + time_val.charAt(4);
-          // console.log(fi);
-          count += 1;
-          ending = 1;
-        }
-        cell_before_color = cell_color;
+    // console.log(table[col].length);
+    for (var i = 0; i < table[col].length; i++) {
+      // color_current = rename_color(sheet.getCell(table[col][i]).fill.fgColor.argb);
+      color_current = table[col][i];
+      // console.log(table[col][i] + ' - current -  ' + color_current);
+      var j = i;
+      if (j == 0) {
+        j = 1;
       }
-      // console.log(fi);
-    });
-    console.log(col);
-    // console.log(fi);
-    fitnes[col-1] = fi;
-
+      // color_before = rename_color(sheet.getCell(table[col][j-1]).fill.fgColor.argb);
+      color_before = table[col][j-1];
+      // console.log(table[col][i] + ' - before - ' + color_before);
+      var u = i;
+      if (u == 60) {
+        u = 59;
+      }
+      // color_after = rename_color(sheet.getCell(table[col][u+1]).fill.fgColor.argb);
+      color_after = table[col][u+1];
+      // console.log(table[col][i] + ' - after - ' + color_after);
+      if (fi[count - 1]) {
+        if (color_current != fi[count - 1].color && ending == 1) {
+           //console.log(time_val_end);
+           var o = i;
+           if (o == 0) {
+             o = 1;
+           }
+          time_before = ti[o - 1];
+          ending = 2;
+          fi[count - 1].end = time_before.charAt(6) + time_before.charAt(7) + ':' + time_before.charAt(9) + time_before.charAt(10);
+          // console.log(fi);
+        }
+      }
+      if (color_current != 'white' && color_current != color_before) {
+        var time_val = ti[i];
+        // console.log(time_val);
+        fi[count] = {};
+        fi[count].color = color_current;
+        fi[count].begin = time_val.charAt(0) + time_val.charAt(1) + ':' + time_val.charAt(3) + time_val.charAt(4);
+        // console.log(fi);
+        count += 1;
+        ending = 1;
+      }
+    }
+    fitnes[col + 1] = fi;
   }
-  console.log('\nfitnes = ');
   console.log(fitnes);
-  // console.log(fitnes);
+
+  var path_save = __dirname + '\\grafic_' + month + '\\';
+  if (!fs.existsSync(path_save)){
+      fs.mkdirSync(path_save);
+  }
+
+  var to_json = JSON.stringify(fitnes);
+
+  console.log(path_save);
+  fs.writeFile(path_save + filename  + '.json', to_json, function () {
+    console.log('write success');
+  });
 }
-
-
-  // function get_before(sh, ad, ce) {
-  //   ad = 'AB14';
-  //   console.log(ad);
-  //   console.log('in get_before');
-  //   console.log(ad.length);
-  //   if (ad.length > 2) {
-  //     console.log('in ad = ' + ad.length);
-  //     var nomer_before = parseInt(ad.substring(2)) - 1;
-  //     var adres_before = ad.charAt(0) + ad.charAt(1) + nomer_before;
-  //     var cell_before = sh.getCell(adres_before).fill.fgColor.argb;
-  //     var color_before = rename_color(cell_before);
-  //     console.log(color_before);
-  //   }
-  //
-  //   if (ad.length < 2) {
-  //
-  //   }
-  // }
+//
+function get_arr(shee){
+  console.log('in get_arr');
+  var row_date = 3; //Номер строки с датами в месяце
+  var first_col = 2;//Номер первого столбца с данными
+  var first_row = row_date + 1;
+  var arr = [];//Массив имен столбцев
+  var table = [];// Массив таблицы с данными
+  var dat = {};
+  var row = shee.getRow(row_date);
+  row.eachCell(function(cell, colNumber) {
+    var ind = cell.address.match(row_date).index;
+    var im = cell.address.substring(0, ind);
+    arr[colNumber-first_col] = im;
+  });
+  var day = arr.length; //Количество дней в месяце
+  // day = 28;
+  for (var i = 0; i < day; i++) {
+    var row = [];
+    for (var j = first_row; j < first_row + 61; j++) {
+      var ty = arr[i] + j;
+      if (shee.getCell(ty).fill) {
+        row[j - first_row] = rename_color(shee.getCell(ty).fill.fgColor.argb);
+      }
+      else {
+        row[j - first_row] = 'white';
+      }
+      // row[j - first_row] = arr[i] + j;
+    }
+    table[i] = row;
+  }
+  var time = []; //Массив времени
+  for (var o = first_row; o < first_row + 61; o++) {
+    time[o - first_row] = shee.getCell('A' + o).value;
+  }
+  // console.log(table);
+  dat.time = time;
+  dat.table = table;
+    return new Promise((resolve, reject) => {
+      setTimeout(function () {
+        resolve(dat);
+      }, 1000);
+    });
+}
