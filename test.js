@@ -2,8 +2,8 @@ var Excel = require('exceljs');
 var filename = 'tren';
 var color = require('./color.json');
 var fs = require('fs');
-var month = 3;
 
+var month = 3;//Номер месяца
 var posledn_stroka = 33;//Номер последней строки
 var row_date = 3; //Номер строки с датами в месяце
 var first_col = 2;//Номер первого столбца с данными
